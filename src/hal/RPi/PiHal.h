@@ -32,9 +32,10 @@ class PiHal : public RadioLibHal {
     }
 
     void init() override {
-      if(_gpioHandle != -1) {
+      if(_initialized) {
         return;
       }
+      _initialized = true;
 
       // first initialise lgpio library
       if((_gpioHandle = lgGpiochipOpen(_gpioDevice)) < 0) {
@@ -247,6 +248,7 @@ class PiHal : public RadioLibHal {
     const uint8_t _spiChannel;
     int _gpioHandle = -1;
     int _spiHandle = -1;
+    bool _initialized = false;
 
     int pinFlags[PI_MAX_USER_GPIO + 1] = { 0 };
 };

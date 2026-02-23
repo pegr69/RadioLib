@@ -195,6 +195,7 @@
   //#define RADIOLIB_EXCLUDE_SX126X           (1)
   //#define RADIOLIB_EXCLUDE_STM32WLX         (1) // dependent on RADIOLIB_EXCLUDE_SX126X
   //#define RADIOLIB_EXCLUDE_SX128X           (1)
+  //#define RADIOLIB_EXCLUDE_SX130X           (1)
   //#define RADIOLIB_EXCLUDE_AFSK             (1)
   //#define RADIOLIB_EXCLUDE_AX25             (1)
   //#define RADIOLIB_EXCLUDE_HELLSCHREIBER    (1)

@@ -101,6 +101,8 @@
 #include "modules/SX128x/SX1280.h"
 #include "modules/SX128x/SX1281.h"
 #include "modules/SX128x/SX1282.h"
+#include "modules/SX130x/SX1301.h"
+#include "modules/SX130x/SX1302.h"
 
 // physical layer protocols
 #include "protocols/PhysicalLayer/PhysicalLayer.h"
