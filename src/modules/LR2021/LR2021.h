@@ -42,6 +42,13 @@ class LR2021: public LRxxxx {
     */
     uint32_t irqDioNum = 5;
 
+    /*! 
+      \brief Determines the type of Lora CAD to perform, either "standard" CAD
+      (same as is implem,ented LR11x0, SX126x and others), or a "fast" CAD if set to true.
+      If there is no signal to be detected, fast CAD should return faster than standard CAD.
+    */
+    bool fastCad = false;
+
     /*!
       \brief Custom operation modes for LR2021.
       Needed because LR2021 has several modems (sub-GHz, 2.4 GHz etc.) in one package
@@ -595,16 +602,18 @@ class LR2021: public LRxxxx {
     float getTemperature(uint8_t source, uint8_t bits = 13);
 
     /*!
-      \brief Gets recorded signal strength indicator.
+      \brief Gets received signal strength indicator.
       Overload with packet mode enabled for PhysicalLayer compatibility.
       \returns RSSI value in dBm.
     */
     float getRSSI() override;
 
     /*!
-      \brief Gets RSSI (Recorded Signal Strength Indicator).
+      \brief Gets RSSI (Received Signal Strength Indicator).
       \param packet Whether to read last packet RSSI, or the current value.
-      \param skipReceive Set to true to skip putting radio in receive mode for the RSSI measurement in FSK/OOK mode.
+      NOTE: With OOK modem, the "packet" RSSI value is the received power level of the high bits (digital 1).
+      \param skipReceive Set to true to skip putting radio in receive mode for instantaneous RSSI measurement.
+      If false, after the RSSI measurement, the radio will be in standby mode.
       \returns RSSI value in dBm.
     */
     float getRSSI(bool packet, bool skipReceive = false);
@@ -677,6 +686,27 @@ class LR2021: public LRxxxx {
     */
     int16_t setGain(uint8_t gain);
 
+    /*!
+      \brief Read status of the last received packet.
+      Each parameter can be set to NULL if the caller is not intending to process it.
+      \param cr Coding rate of the last received packet
+      \param crc Will be set to true if the last packet had a CRC, false otherwise
+      \param packetLen Length of the last received packet in bytes
+      \param snrPacket SNR of the last received packet in dB
+      \param rssiPacket RSSI of the last received packet in dBm
+      \param rssiSignalPacket Estimation of the RSSI of LoRa signal after despreading in dBm
+      \returns \ref status_codes
+    */
+    int16_t getLoRaPacketStatus(uint8_t* cr, bool* crc, uint8_t* packetLen = NULL, float* snrPacket = NULL, float* rssiPacket = NULL, float* rssiSignalPacket = NULL);
+
+    /*!
+      \brief Get LoRa header information from last received packet. Implementation based on getLoRaPacketStatus.
+      \param cr Pointer to variable to store the coding rate.
+      \param hasCRC Pointer to variable to store the CRC status.
+      \returns \ref status_codes
+    */
+    int16_t getLoRaRxHeaderInfo(uint8_t* cr, bool* hasCRC);
+
 #if !RADIOLIB_GODMODE && !RADIOLIB_LOW_LEVEL
   protected:
 #endif
@@ -703,7 +733,7 @@ class LR2021: public LRxxxx {
     bool findChip(void);
     int16_t config(uint8_t modem);
     int16_t setPacketMode(uint8_t mode, uint8_t len);
-    int16_t startCad(uint8_t symbolNum, uint8_t detPeak, uint8_t detMin, uint8_t exitMode, RadioLibTime_t timeout);
+    int16_t startCad(uint8_t symbolNum, uint8_t detPeak, bool fast, uint8_t exitMode, RadioLibTime_t timeout);
 
     // chip control commands
     int16_t readRadioRxFifo(uint8_t* data, size_t len);
@@ -778,7 +808,6 @@ class LR2021: public LRxxxx {
     int16_t setLoRaCadParams(uint8_t numSymbols, bool preambleOnly, uint8_t pnrDelta, uint8_t cadExitMode, uint32_t timeout, uint8_t detPeak);
     int16_t setLoRaCad(void);
     int16_t getLoRaRxStats(uint16_t* pktRxTotal, uint16_t* pktCrcError, uint16_t* headerCrcError, uint16_t* falseSynch);
-    int16_t getLoRaPacketStatus(uint8_t* crc, uint8_t* cr, uint8_t* packetLen, float* snrPacket, float* rssiPacket, float* rssiSignalPacket);
     int16_t setLoRaAddress(uint8_t addrLen, uint8_t addrPos, const uint8_t* addr);
     int16_t setLoRaHopping(uint8_t hopCtrl, uint16_t hopPeriod, const uint32_t* freqHops, size_t numFreqHops);
     int16_t setLoRaTxSync(uint8_t function, uint8_t dioNum);
@@ -834,7 +863,7 @@ class LR2021: public LRxxxx {
     int16_t setOokSyncword(const uint8_t* syncWord, size_t syncWordLen, bool msbFirst);
     int16_t setOokAddress(uint8_t addrNode, uint8_t addrBroadcast);
     int16_t getOokRxStats(uint16_t* packetRx, uint16_t* crcError, uint16_t* lenError);
-    int16_t getOokPacketStatus(uint16_t* packetLen, float* rssiAvg, float* rssiSync, bool* addrMatchNode, bool* addrMatchBroadcast, float* lqi);
+    int16_t getOokPacketStatus(uint16_t* packetLen, float* rssiAvg, float* rssiHigh, bool* addrMatchNode, bool* addrMatchBroadcast, float* lqi);
     int16_t setOokDetector(uint16_t preamblePattern, uint8_t patternLen, uint8_t patternNumRepeaters, bool syncWordRaw, bool sofDelimiterRising, uint8_t sofDelimiterLen);
     int16_t setOokWhiteningParams(uint8_t bitIdx, uint16_t poly, uint16_t init);
 

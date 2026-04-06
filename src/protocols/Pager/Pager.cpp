@@ -309,7 +309,7 @@ int16_t PagerClient::readData(String& str, size_t len, uint32_t* addr) {
 
   // build a temporary buffer
   #if RADIOLIB_STATIC_ONLY
-    uint8_t data[RADIOLIB_STATIC_PROTOCOL_ARRAY_SIZE + 1];
+    uint8_t data[RADIOLIB_STATIC_ARRAY_SIZE + 1];
   #else
     uint8_t* data = new uint8_t[length + 1];
     RADIOLIB_ASSERT_PTR(data);

@@ -1109,6 +1109,22 @@ float LR11x0::getRSSI() {
   return(val);
 }
 
+float LR11x0::getRSSI(bool packet, bool skipReceive) {
+  float val = 0;
+
+  // check if RSSI of packet is requested
+  if (packet) {
+    val = getRSSI();
+  } else {
+    if(!skipReceive) { (void)startReceive(); }
+    int16_t state = getRssiInst(&val);
+    if(!skipReceive) { (void)standby(); }
+    if(state != RADIOLIB_ERR_NONE) { return(0); }
+  }
+
+  return(val);
+}
+
 float LR11x0::getSNR() {
   float val = 0;
 

@@ -155,7 +155,7 @@ class SX1278: public SX127x {
     // configuration methods
 
     /*!
-      \brief Sets carrier frequency. Allowed values range from 137.0 MHz to 525.0 MHz.
+      \brief Sets carrier frequency. Allowed values range from 137.0 MHz to 175.0 MHz and 395.0 to 525.0 MHz (datasheet minimum is 410.0 MHz, hardware works lower).
       \param freq Carrier frequency to be set in MHz.
       \returns \ref status_codes
     */
@@ -270,14 +270,14 @@ class SX1278: public SX127x {
     int16_t setDataShapingOOK(uint8_t sh);
 
     /*!
-      \brief Gets recorded signal strength indicator.
+      \brief Gets received signal strength indicator.
       Overload with packet mode enabled for PhysicalLayer compatibility.
       \returns RSSI value in dBm.
     */
     float getRSSI() override;
 
     /*!
-      \brief Gets recorded signal strength indicator.
+      \brief Gets received signal strength indicator.
       \param packet Whether to read last packet RSSI, or the current value. LoRa mode only, ignored for FSK.
       \param skipReceive Set to true to skip putting radio in receive mode for the RSSI measurement in FSK/OOK mode.
       \returns RSSI value in dBm.

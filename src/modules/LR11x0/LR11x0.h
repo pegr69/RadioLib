@@ -424,10 +424,19 @@ class LR11x0: public LRxxxx {
     int16_t invertIQ(bool enable) override;
 
     /*!
-      \brief Gets RSSI (Recorded Signal Strength Indicator) of the last received packet. Only available for LoRa or GFSK modem.
+      \brief Gets RSSI (Received Signal Strength Indicator) of the last received packet. Only available for LoRa or GFSK modem.
       \returns RSSI of the last received packet in dBm.
     */
     float getRSSI() override;
+
+    /*!
+      \brief Gets RSSI (Received Signal Strength Indicator).
+      \param packet Whether to read last packet RSSI, or the current value.
+      \param skipReceive Set to true to skip putting radio in receive mode for instantaneous RSSI measurement.
+      If false, after the RSSI measurement, the radio will be in standby mode.
+      \returns RSSI value in dBm.
+    */
+    float getRSSI(bool packet, bool skipReceive = false);
 
     /*!
       \brief Gets SNR (Signal to Noise Ratio) of the last received packet. Only available for LoRa modem.
@@ -922,7 +931,6 @@ class LR11x0: public LRxxxx {
 #endif
     uint8_t wifiScanMode = 0;
     bool gnss = false;
-
     int16_t modSetup(float tcxoVoltage, uint8_t modem);
     bool findChip(uint8_t ver);
     int16_t config(uint8_t modem);
